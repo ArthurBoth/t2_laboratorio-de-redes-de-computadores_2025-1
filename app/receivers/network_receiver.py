@@ -1,11 +1,15 @@
 from abc import ABC, abstractmethod
 
 from app.receivers.ethernet_receiver import EthernetReceiver
+from app.receivers.network.arp_receiver import ARPReceiver
 from app.receivers.network.ipv4_receiver import IPv4Receiver
+from app.receivers.network.ipv6_receiver import IPv6Receiver
 
 class NetworkReceiver(ABC):
     protocol_name: str
     eth_hex: int
+    header_index: int
+    header_size: int
     
     @staticmethod
     def data_link() -> EthernetReceiver:
@@ -32,6 +36,10 @@ class NetworkReceiver(ABC):
     def assemble_return(self, timestamp, src_ip, dst_ip, protocol, total_len) -> str:
         """Assemble the return string for CSV writing."""
         return [timestamp, self.protocol_name, src_ip, dst_ip, protocol, total_len]
+
+    def get_header_index(self) -> int:
+        """Return the index of the header in the data."""
+        return self.header_index
     
     @abstractmethod
     def get_protocol_data(self) -> int:

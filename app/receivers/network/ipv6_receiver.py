@@ -3,23 +3,23 @@ import struct
 from app.utils import formatter
 from ..network_receiver import NetworkReceiver
 
-class IPv4Receiver(NetworkReceiver):
+class IPv6Receiver(NetworkReceiver):
     next_protocol: int
 
     def __init__(self):
-        self.protocol_name = "IPv4"
+        self.protocol_name = "IPv6"
         self.header_index  = 14
-        self.header_size   = 20
+        self.header_size   = 40
 
     def receive(self, timestamp, data) -> str:
         """Process the received data and return a string list, ready to be written to CSV."""
-        header              = struct.unpack('!BBHHHBBH4s4s', data[:self.header_size])
+        header              = struct.unpack('!IHBB16s16s', data[:self.header_size])
         total_len           = header[2]
-        self.next_protocol  = header[6]
-        src_ip              = formatter.ipv4_format(header[8])
-        dst_ip              = formatter.ipv4_format(header[9])
+        self.next_protocol  = header[3]
+        src_ip              = formatter.ipv6_format(header[5])
+        dst_ip              = formatter.ipv6_format(header[6])
 
-        if ((dst_ip == '127.0.0.1') or (src_ip == '127.0.0.1')): # Skip WSL shenanigans
+        if ((dst_ip == '::1') or (src_ip == '::1')): # Skip WSL shenanigans
             return None
         return self.assemble_return(timestamp, src_ip, dst_ip, self.next_protocol, total_len)
 
