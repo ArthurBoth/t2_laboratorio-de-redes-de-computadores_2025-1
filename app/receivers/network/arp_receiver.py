@@ -1,7 +1,7 @@
 import struct
 
 from app.utils import formatter
-from ..network_receiver import NetworkReceiver
+from ..receiver import Receiver
 
 PTYPE_NAMES = {
     0x0800: "IPv4",
@@ -15,7 +15,7 @@ PTYPE_NAMES = {
     0x8848: "MPLS Multicast",
 }
 
-class ARPReceiver(NetworkReceiver):
+class ARPReceiver(Receiver):
     next_protocol: int
 
     def __init__(self):
@@ -31,13 +31,13 @@ class ARPReceiver(NetworkReceiver):
 
         start = self.constant_header_size + hw_size
 
-        src_ip = formatter.dynamic_protocol_format(protocol_type, data[start:start+proto_size])
-        start += proto_size + hw_size
-        dst_ip = formatter.dynamic_protocol_format(protocol_type, data[start:start+proto_size])
+        src_ip  = formatter.dynamic_protocol_format(protocol_type, data[start:start+proto_size])
+        start  += proto_size + hw_size
+        dst_ip  = formatter.dynamic_protocol_format(protocol_type, data[start:start+proto_size])
 
-        protocol_subname   = PTYPE_NAMES.get(protocol_type, f"Unknown Protocol {protocol_type:#04x}")
+        protocol_subname = PTYPE_NAMES.get(protocol_type, f"Unknown Protocol {protocol_type:#04x}")
 
-        return self.assemble_return(timestamp, src_ip, dst_ip, protocol_subname, self.header_size)
+        return self.assemble_return(timestamp, src_ip, dst_ip, protocol_subname, len(data))
 
     def get_protocol_data(self) -> int:
         """Return the next_protocol number."""

@@ -1,7 +1,7 @@
 import socket
 from datetime import datetime
 from collections import defaultdict
-from app.receivers.network_receiver import NetworkReceiver
+from app.receivers.receiver import Receiver
 from csv_manager import CSVManager, OsiLayer
 
 counters = defaultdict(int)
@@ -18,22 +18,27 @@ def main():
 
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
-            receiver  = NetworkReceiver.data_link()
-            csv_list  = receiver.receive(timestamp, raw_data[0])
+            receiver = Receiver.data_link()
+            csv_list = receiver.receive(timestamp, raw_data[0])
             if (not csv_list):
                 continue
             manager.write(OsiLayer.DATA_LINK, csv_list)
             counters[receiver.get_protocol_name()] += 1
 
-            receiver = NetworkReceiver.network(receiver.get_protocol_data())
-            csv_list = receiver.receive(timestamp, raw_data[receiver.header_index:])
+            receiver        = Receiver.network(receiver.get_protocol_data())
+            nt_header_index = receiver.get_header_index()
+            nt_header_size  = receiver.get_header_size()
+            csv_list        = receiver.receive(timestamp, raw_data[nt_header_index:])
             if (not csv_list):
                 continue
             manager.write(OsiLayer.NETWORK, csv_list)
             counters[receiver.get_protocol_name()] += 1
 
-            receiver = NetworkReceiver.transport(receiver.get_protocol_data())
-            csv_list = receiver.receive(timestamp, raw_data[receiver.header_index:])
+            receiver = Receiver.transport(receiver.get_protocol_data())
+            if (not receiver):
+                continue
+            receiver.set_ips(csv_list[2], csv_list[3])
+            csv_list = receiver.receive(timestamp, raw_data[(nt_header_index + nt_header_size):])
             if (not csv_list):
                 continue
             manager.write(OsiLayer.TRANSPORT, csv_list)

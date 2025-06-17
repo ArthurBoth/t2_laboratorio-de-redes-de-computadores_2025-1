@@ -1,9 +1,9 @@
 import struct
 
 from app.utils import formatter
-from .network_receiver import NetworkReceiver
+from .receiver import Receiver
 
-class EthernetReceiver(NetworkReceiver):
+class EthernetReceiver(Receiver):
     eth_hex: int
 
     def __init__(self):
