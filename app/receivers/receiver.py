@@ -4,6 +4,7 @@ from app.receivers.ethernet_receiver import EthernetReceiver
 from app.receivers.network.arp_receiver import ARPReceiver
 from app.receivers.network.ipv4_receiver import IPv4Receiver
 from app.receivers.network.ipv6_receiver import IPv6Receiver
+from app.receivers.transport_receiver import TransportReceiver
 
 class Receiver(ABC): 
     protocol_name: str
@@ -28,16 +29,8 @@ class Receiver(ABC):
                 return None
 
     @staticmethod
-    def transport(protocol: int) -> ICMPReceiver | TCPReceiver | UDPReceiver | None:
-        match protocol:
-            case 1, 58:  # ICMP, ICMPv6
-                return ICMPReceiver(protocol)
-            case 6:
-                return TCPReceiver(protocol)
-            case 17:
-                return UDPReceiver(protocol)
-            case _:
-                return None
+    def transport(protocol: int) -> TransportReceiver | None:
+        return TransportReceiver(protocol)
             
     def get_protocol_name(self) -> str:
         return self.protocol_name

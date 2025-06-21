@@ -16,8 +16,6 @@ PTYPE_NAMES = {
 }
 
 class ARPReceiver(Receiver):
-    next_protocol: int
-
     def __init__(self):
         self.protocol_name        = "ARP"
         self.header_index         = 14
@@ -41,4 +39,4 @@ class ARPReceiver(Receiver):
 
     def get_protocol_data(self) -> int:
         """Return the next_protocol number."""
-        return self.next_protocol
+        return None
