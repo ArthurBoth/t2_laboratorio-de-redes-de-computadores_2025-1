@@ -1,6 +1,7 @@
 import struct
 
 from app.utils import formatter
+from app.utils.constants import IGNORE_LOCALHOST, NULL_MAC_ADDRESS
 from .receiver import Receiver
 
 class EthernetReceiver(Receiver):
@@ -19,7 +20,7 @@ class EthernetReceiver(Receiver):
         self.eth_hex  = ethernet_data[2]
         total_len     = len(raw_data)
 
-        if (src_mac == '00:00:00:00:00:00'): # Skip WSL shenanigans
+        if ((IGNORE_LOCALHOST) and (src_mac == NULL_MAC_ADDRESS)):
             return None
         return self.assemble_return(timestamp, src_mac, dest_mac, self.eth_hex, total_len)
 

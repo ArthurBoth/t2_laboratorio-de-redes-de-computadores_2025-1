@@ -21,7 +21,6 @@ class CSVManager:
         self.c4_writer.writerow(["Timestamp", "Protocol", "Source_IP", "Source_Port", "Destination_IP", "Destination_Port", "Packet_Size"])
 
     def write(self, layer: OsiLayer, data : list):
-        print (f"Writing to {layer.value}: {data}")
         match layer:
             case OsiLayer.DATA_LINK:
                 self.c2_writer.writerow(data)

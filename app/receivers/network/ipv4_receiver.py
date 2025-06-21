@@ -1,6 +1,7 @@
 import struct
 
 from app.utils import formatter
+from app.utils.constants import IGNORE_LOCALHOST, LOCALHOST
 from ..receiver import Receiver
 
 class IPv4Receiver(Receiver):
@@ -19,8 +20,8 @@ class IPv4Receiver(Receiver):
         src_ip             = formatter.ipv4_format(header[8])
         dst_ip             = formatter.ipv4_format(header[9])
 
-        if ((dst_ip == '127.0.0.1') or (src_ip == '127.0.0.1')): # Skip WSL shenanigans
-            return None
+        # if ((IGNORE_LOCALHOST) and ((dst_ip == LOCALHOST) or (src_ip == LOCALHOST))):
+        #     return None
         return self.assemble_return(timestamp, src_ip, dst_ip, self.next_protocol, len(data))
 
     def get_protocol_data(self) -> int:

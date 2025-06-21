@@ -1,6 +1,7 @@
 import struct
 
 from app.utils import formatter
+from app.utils.constants import IGNORE_LOCALHOST, IPV6_ADDRESS
 from ..receiver import Receiver
 
 EXTENSION_HEADERS = {
@@ -27,7 +28,7 @@ class IPv6Receiver(Receiver):
         src_ip              = formatter.ipv6_format(header[5])
         dst_ip              = formatter.ipv6_format(header[6])
 
-        if ((dst_ip == '::1') or (src_ip == '::1')): # Skip WSL shenanigans
+        if ((IGNORE_LOCALHOST) and ((dst_ip == IPV6_ADDRESS) or (src_ip == IPV6_ADDRESS))):
             return None
         return self.assemble_return(timestamp, src_ip, dst_ip, self.next_protocol, len(data))
 

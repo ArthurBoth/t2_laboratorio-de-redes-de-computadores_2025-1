@@ -2,7 +2,9 @@ import socket
 from datetime import datetime
 from collections import defaultdict
 from app.receivers.receiver import Receiver
-from csv_manager import CSVManager, OsiLayer
+from app.receivers.receiver_creator import ReceiverCreator
+from app.utils.constants import IGNORE_LOCALHOST
+from app.utils.csv_manager import CSVManager, OsiLayer
 
 counters = defaultdict(int)
 
@@ -13,32 +15,32 @@ def main():
     try:
         while True:
             raw_data = sock.recvfrom(1 << 16) # 64Kb buffer
-            if (len(raw_data) < 14):
+            if ((IGNORE_LOCALHOST) and (len(raw_data) < 14)):
                 continue
 
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
-            receiver = Receiver.data_link()
+            receiver = ReceiverCreator.data_link()
             csv_list = receiver.receive(timestamp, raw_data[0])
             if (not csv_list):
                 continue
             manager.write(OsiLayer.DATA_LINK, csv_list)
             counters[receiver.get_protocol_name()] += 1
 
-            receiver        = Receiver.network(receiver.get_protocol_data())
+            receiver        = ReceiverCreator.network(receiver.get_protocol_data())
             nt_header_index = receiver.get_header_index()
             nt_header_size  = receiver.get_header_size()
-            csv_list        = receiver.receive(timestamp, raw_data[nt_header_index:])
+            csv_list        = receiver.receive(timestamp, raw_data[0][nt_header_index:])
             if (not csv_list):
                 continue
             manager.write(OsiLayer.NETWORK, csv_list)
             counters[receiver.get_protocol_name()] += 1
 
-            receiver = Receiver.transport(receiver.get_protocol_data())
+            receiver = ReceiverCreator.transport(receiver.get_protocol_data())
             if (not receiver):
                 continue
             receiver.set_ips(csv_list[2], csv_list[3])
-            csv_list = receiver.receive(timestamp, raw_data[(nt_header_index + nt_header_size):])
+            csv_list = receiver.receive(timestamp, raw_data[0][(nt_header_index + nt_header_size):])
             if (not csv_list):
                 continue
             manager.write(OsiLayer.TRANSPORT, csv_list)
