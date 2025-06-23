@@ -22,5 +22,7 @@ class ReceiverCreator:
                 return None
 
     @staticmethod
-    def transport(protocol: int) -> TransportReceiver | None:
+    def transport(protocol: int | None) -> TransportReceiver | None:
+        if (not protocol):
+            return None
         return TransportReceiver(protocol)

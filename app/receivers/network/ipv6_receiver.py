@@ -24,10 +24,10 @@ class IPv6Receiver(Receiver):
     def receive(self, timestamp, data) -> str:
         """Process the received data and return a string list, ready to be written to CSV."""
         header              = struct.unpack('!IHBB16s16s', data[:self.header_size])
-        self.next_protocol  = header[3]
-        src_ip              = formatter.ipv6_format(header[5])
-        dst_ip              = formatter.ipv6_format(header[6])
+        src_ip              = formatter.ipv6_format(header[4])
+        dst_ip              = formatter.ipv6_format(header[5])
 
+        self.check_extension_headers(header[2], data)
         if ((IGNORE_LOCALHOST) and ((dst_ip == IPV6_ADDRESS) or (src_ip == IPV6_ADDRESS))):
             return None
         return self.assemble_return(timestamp, src_ip, dst_ip, self.next_protocol, len(data))
