@@ -5,6 +5,7 @@ class TransportReceiver(Receiver):
     protocol_id: int
     src_ip     : str
     dst_ip     : str
+    unpack_str : str
 
     def __init__(self, protocol: int):
         self.protocol_id = protocol
@@ -15,14 +16,16 @@ class TransportReceiver(Receiver):
             case 6:
                 self.protocol_name = "TCP"
                 self.header_size   = 20
+                self.unpack_str    = "!HHLLBBHHH"
             case 17:
                 self.protocol_name = "UDP"
                 self.header_size   = 8
+                self.unpack_str    = "!HHHH"
             case 58:
                 self.protocol_name = "ICMPv6"
                 self.header_size   = 4
             case _:
-                raise ValueError("Unsuported protocol number")
+                raise ValueError(f"Unsuported protocol number: {protocol}")
 
     def set_ips(self, src_ip: str, dst_ip: str) -> None:
         """Set the source and destination IP addresses."""
@@ -43,7 +46,7 @@ class TransportReceiver(Receiver):
             src_port = 0
             dst_port = 0
         else:
-            header = struct.unpack('!HHLLBBHHH', data[:self.header_size])
+            header = struct.unpack(self.unpack_str, data[:self.header_size])
             src_port = header[0]
             dst_port = header[1]
 

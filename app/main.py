@@ -27,7 +27,9 @@ def main():
             manager.write(OsiLayer.DATA_LINK, csv_list)
             counters[receiver.get_protocol_name()] += 1
 
-            receiver        = ReceiverCreator.network(receiver.get_protocol_data())
+            receiver = ReceiverCreator.network(receiver.get_protocol_data())
+            if (not receiver):
+                continue
             nt_header_index = receiver.get_header_index()
             nt_header_size  = receiver.get_header_size()
             csv_list        = receiver.receive(timestamp, raw_data[0][nt_header_index:])
