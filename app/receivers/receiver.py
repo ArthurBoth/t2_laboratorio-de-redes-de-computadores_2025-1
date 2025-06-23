@@ -9,10 +9,6 @@ class Receiver(ABC):
     def get_protocol_name(self) -> str:
         return self.protocol_name
 
-    def assemble_return(self, timestamp, src_ip, dst_ip, protocol, total_len) -> list[str]:
-        """Assemble the return string for CSV writing."""
-        return [timestamp, self.protocol_name, src_ip, dst_ip, protocol, total_len]
-
     def get_header_index(self) -> int:
         """Return the index of the header in the data."""
         return self.header_index
@@ -20,6 +16,11 @@ class Receiver(ABC):
     def get_header_size(self) -> int:
         """Return the size of the header."""
         return self.header_size
+
+    @abstractmethod
+    def assemble_return(self, timestamp, src, dst, protocol, total_len) -> list[str]:
+        """Assemble the return string for CSV writing."""
+        pass
     
     @abstractmethod
     def get_protocol_data(self) -> int | None:

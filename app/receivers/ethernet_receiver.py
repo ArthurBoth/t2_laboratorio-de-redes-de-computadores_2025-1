@@ -24,6 +24,10 @@ class EthernetReceiver(Receiver):
             return None
         return self.assemble_return(timestamp, src_mac, dest_mac, self.eth_hex, total_len)
 
+    def assemble_return(self, timestamp, src, dst, protocol, total_len) -> list[str]:
+        """Assemble the return string for CSV writing."""
+        return [timestamp, src, dst, hex(protocol), total_len]
+
     def get_protocol_data(self) -> int:
         """Return the Network protocol number."""
         return self.eth_hex

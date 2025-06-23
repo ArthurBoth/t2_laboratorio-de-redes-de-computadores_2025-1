@@ -32,6 +32,10 @@ class IPv6Receiver(Receiver):
             return None
         return self.assemble_return(timestamp, src_ip, dst_ip, self.next_protocol, len(data))
 
+    def assemble_return(self, timestamp, src, dst, protocol, total_len) -> list[str]:
+        """Assemble the return string for CSV writing."""
+        return [timestamp, self.protocol_name, src, dst, protocol, total_len]
+
     def get_protocol_data(self) -> int:
         """Return the Transport protocol number."""
         return self.next_protocol

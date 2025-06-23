@@ -51,3 +51,7 @@ class TransportReceiver(Receiver):
             dst_port = header[1]
 
         return self.assemble_return(timestamp, self.src_ip, src_port, self.dst_ip, dst_port, len(data))
+
+    def assemble_return(self, timestamp, src_ip, src_port, dst_ip, dst_port, total_len) -> list[str]:
+        """Assemble the return string for CSV writing."""
+        return [timestamp, self.protocol_name, src_ip, src_port, dst_ip, dst_port, total_len]

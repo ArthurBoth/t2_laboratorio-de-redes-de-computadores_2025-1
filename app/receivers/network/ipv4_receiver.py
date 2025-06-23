@@ -20,9 +20,13 @@ class IPv4Receiver(Receiver):
         src_ip             = formatter.ipv4_format(header[8])
         dst_ip             = formatter.ipv4_format(header[9])
 
-        # if ((IGNORE_LOCALHOST) and ((dst_ip == LOCALHOST) or (src_ip == LOCALHOST))):
-        #     return None
+        if ((IGNORE_LOCALHOST) and ((dst_ip == LOCALHOST) or (src_ip == LOCALHOST))):
+            return None
         return self.assemble_return(timestamp, src_ip, dst_ip, self.next_protocol, len(data))
+
+    def assemble_return(self, timestamp, src, dst, protocol, total_len) -> list[str]:
+        """Assemble the return string for CSV writing."""
+        return [timestamp, self.protocol_name, src, dst, protocol, total_len]
 
     def get_protocol_data(self) -> int:
         """Return the Transport protocol number."""
